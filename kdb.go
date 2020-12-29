@@ -9,7 +9,7 @@ import (
 	"time"
 
 	logger "github.com/alecthomas/log4go"
-	kdb "github.com/sv/kdbgo"
+	kdb "github.com/nsxy/kdbgo"
 	"github.com/syndtr/goleveldb/leveldb"
 )
 
@@ -352,6 +352,7 @@ func (tb *tradeKdb) start() {
 	tb.connect()
 	tb.slice2Map()
 	tb.openDB()
+	tb.save()
 	tb.updateAfterReboot()
 
 	tb.subscribe(RequestTab, tb.sym)

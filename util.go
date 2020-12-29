@@ -3,7 +3,7 @@ package kdbTdxV3
 import (
 	"time"
 
-	kdb "github.com/sv/kdbgo"
+	kdb "github.com/nsxy/kdbgo"
 )
 
 func ord2resp(order *Order) *kdb.K {
