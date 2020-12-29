@@ -1,4 +1,4 @@
-module  github.com/nsxy/kdbTdx
+module  github.com/nsxy/kdbtdx
 
 go 1.14
 

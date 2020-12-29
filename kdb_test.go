@@ -1,4 +1,4 @@
-package kdbTdxV3
+package kdbtdx
 
 import (
 	"testing"
