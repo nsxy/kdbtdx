@@ -1,9 +1,9 @@
-package kdbtdx
+package kdbTdxV3
 
 import (
 	"time"
 
-	kdb "github.com/nsxy/kdbgo"
+	kdb "github.com/sv/kdbgo"
 )
 
 func ord2resp(order *Order) *kdb.K {
@@ -72,4 +72,11 @@ func GetUnFinalizedOrderNo() map[int32]bool {
 		return true
 	})
 	return res
+}
+
+func Store(o *Order) {
+
+	Tb.updateTab(o)
+	Tb.oChan <- o
+	Tb.orderMap.Store(o.EntrustNo, o)
 }

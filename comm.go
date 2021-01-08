@@ -1,4 +1,4 @@
-package kdbtdx
+package kdbTdxV3
 
 import (
 	"time"

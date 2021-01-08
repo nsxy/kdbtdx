@@ -1,4 +1,4 @@
-package kdbtdx
+package kdbTdxV3
 
 import (
 	"encoding/json"
@@ -9,7 +9,7 @@ import (
 	"time"
 
 	logger "github.com/alecthomas/log4go"
-	kdb "github.com/nsxy/kdbgo"
+	kdb "github.com/sv/kdbgo"
 	"github.com/syndtr/goleveldb/leveldb"
 )
 
@@ -286,14 +286,15 @@ func (tb *tradeKdb) updateOrder(o *Order) {
 		_ = logger.Error("found no order which matched with %#v", o)
 		return
 	}
+	// atomic
 	if oo := oi.(*Order); oo.Status >= o.Status && oo.CumQty >= o.CumQty {
 		logger.Debug("don't update, order info: %#v", oo)
 		return
 	}
+	tb.orderMap.Store(o.EntrustNo, o)
 	logger.Debug("send to kdb, order info: %#v", o)
 	go tb.updateTab(o)
 	tb.oChan <- o
-	tb.orderMap.Store(o.EntrustNo, o)
 }
 
 func (tb *tradeKdb) querySql() ([]*queryResult, error) {
