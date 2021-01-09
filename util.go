@@ -1,9 +1,9 @@
-package kdbTdxV3
+package kdbtdx
 
 import (
 	"time"
 
-	kdb "github.com/sv/kdbgo"
+	kdb "github.com/nsxy/kdbgo"
 )
 
 func ord2resp(order *Order) *kdb.K {

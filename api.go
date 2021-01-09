@@ -1,4 +1,4 @@
-package kdbTdxV3
+package kdbtdx
 
 import (
 	"os"
@@ -6,7 +6,7 @@ import (
 	"sync/atomic"
 
 	logger "github.com/alecthomas/log4go"
-	"github.com/robfig/cron"
+	"github.com/robfig/cron/v3"
 )
 
 type TradeApi interface {
