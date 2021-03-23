@@ -132,6 +132,18 @@ func (tb *tradeKdb) readFromKdb() {
 							if _, ok := tb.symMap[row.Accountname]; !ok {
 								return
 							}
+							b := basic{
+								Sym: row.Accountname,
+								Qid: row.Qid,
+							}
+							// cancel order
+							if row.Status == 3 {
+								tb.cancelChan <- &CancelReq{
+									basic: b,
+									Entrustno: row.Entrustno,
+								}
+								return
+							}
 							o := &Order{
 								Request: Request{
 									basic: basic{
