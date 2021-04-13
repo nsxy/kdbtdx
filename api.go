@@ -20,7 +20,9 @@ type TradeApi interface {
 
 func Run(api TradeApi) {
 
-	cronTask()
+	c := make(chan os.Signal)
+	cronTask(c)
+	
 	cfg := api.LoadCfg()
 	Tb = newKdb(cfg.Host, cfg.Port, cfg.Auth, cfg.DbPath, cfg.Sym, cfg.MaxId)
 	Tb.start()
@@ -28,9 +30,8 @@ func Run(api TradeApi) {
 		api.Stop()
 		Tb.stop()
 	}()
-
 	process(api)
-	c := make(chan os.Signal)
+	
 	signal.Notify(c, os.Interrupt, os.Kill)
 	<-c
 }
@@ -81,21 +82,23 @@ func process(api TradeApi) {
 	}()
 }
 
-func cronTask() {
+func cronTask(cos chan os.Signal) {
 
 	go func() {
 		c := cron.New(cron.WithSeconds())
 		// s m h
 		_, _ = c.AddFunc("00 30 16 * * *", func() {
 			logger.Info("close trade system")
-			defer Tb.stop()
-			panic("stop trade")
+			cos <- os.Interrupt
+			//defer Tb.stop()
+			//panic("stop trade")
 		})
 
 		_, _ = c.AddFunc("00 30 22 * * *", func() {
 			logger.Info("close trade system")
-			defer Tb.stop()
-			panic("stop trade")
+			cos <- os.Interrupt
+			//defer Tb.stop()
+			//panic("stop trade")
 		})
 		logger.Info("start cron tasks")
 		c.Start()
