@@ -14,6 +14,7 @@ import (
 )
 
 type tradeKdb struct {
+	fullKdbCfg *FullKdbCfg
 	*kdb.KDBConn
 	*leveldb.DB
 	auth, path string
@@ -26,7 +27,7 @@ type tradeKdb struct {
 	oChan      chan *Order
 }
 
-func newKdb(h string, p int, auth, path string, sym []string, maxId int32) *tradeKdb {
+func newKdb(h string, p int, auth, path string, sym []string, maxId int32, cfg *FullKdbCfg) *tradeKdb {
 
 	return &tradeKdb{
 		KDBConn: &kdb.KDBConn{
@@ -42,6 +43,7 @@ func newKdb(h string, p int, auth, path string, sym []string, maxId int32) *trad
 		cancelChan: make(chan *CancelReq, 10000),
 		orderChan:  make(chan *Order, 10000),
 		oChan:      make(chan *Order, 10000),
+		fullKdbCfg: cfg,
 	}
 }
 
@@ -311,13 +313,20 @@ func (tb *tradeKdb) updateOrder(o *Order) {
 
 func (tb *tradeKdb) querySql() ([]*queryResult, error) {
 
+	cfg := tb.fullKdbCfg
+	conn, err := kdb.DialKDBTimeout(cfg.Host, cfg.Port, cfg.Auth, time.Second*10)
+	if err != nil {
+		logger.Crashf("connect with fullKdb error: %v", err)
+	}
+	defer conn.Close()
+	logger.Debug("connected with fullKdb, host: %v, port: %v", cfg.Host, cfg.Port)
 	acct := strings.Join(tb.sym, "`")
 	query1 := fmt.Sprintf("select entrustno,status,cumqty:abs(bidvol) from %s where accountname in `%s, status < 4", ResponseTab, acct)
 	query2 := fmt.Sprintf("select entrustno,status,cumqty from %s where sym in `%s, status < 4", ResponseTabV3, acct)
 	query := fmt.Sprintf("distinct select from (%s) uj (%s) where status = (min;status) fby entrustno, cumqty = (min;cumqty) fby entrustno",
 		query1, query2)
 
-	res, err := tb.Call(query)
+	res, err := conn.Call(query)
 	if err != nil {
 		return nil, err
 	}
