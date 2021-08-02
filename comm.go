@@ -64,6 +64,13 @@ type Order struct {
 	Note              string
 }
 
+
+type FullKdbCfg struct {
+	Host   string   `json:"host"`
+	Port   int      `json:"port"`
+	Auth   string   `json:"auth"`
+}
+
 type Cfg struct {
 	DbPath string   `json:"dbPath"`
 	Host   string   `json:"host"`
@@ -71,6 +78,7 @@ type Cfg struct {
 	Auth   string   `json:"auth"`
 	Sym    []string `json:"sym"`
 	MaxId  int32    `json:"maxId"`
+	FullKdbCfg *FullKdbCfg `json:"full_kdb_cfg"`
 }
 
 type Hold struct {
